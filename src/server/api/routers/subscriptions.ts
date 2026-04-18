@@ -6,12 +6,14 @@ import { db } from "~/server/db";
 import { subscriptions } from "~/server/db/schema";
 import { sendConfirmationEmail } from "~/lib/email";
 import { COUNTRIES } from "~/lib/countries";
+import { CATEGORIES } from "~/lib/categories";
 
 export const subscriptionsRouter = createTRPCRouter({
   create: publicProcedure
     .input(
       z.object({
         email: z.string().email(),
+        category: z.enum(Object.keys(CATEGORIES) as [string, ...string[]]),
         modelKeyword: z.string().min(1).max(200),
         country: z.enum(Object.keys(COUNTRIES) as [string, ...string[]]),
         minPrice: z.number().int().nonnegative().optional(),
@@ -25,6 +27,7 @@ export const subscriptionsRouter = createTRPCRouter({
       await db.insert(subscriptions).values({
         id,
         email: input.email,
+        category: input.category,
         modelKeyword: input.modelKeyword,
         country: input.country,
         minPrice: input.minPrice ?? null,

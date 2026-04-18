@@ -1,0 +1,55 @@
+meta {
+  name: Create Subscription
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/api/trpc/subscriptions.create
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "json": {
+      "email": "{{email}}",
+      "category": "mac",
+      "modelKeyword": "test",
+      "country": "us",
+      "minPrice": 100000,
+      "maxPrice": 200000
+    }
+  }
+}
+
+vars:pre-request {
+  email: abdulqshabbir@gmail.com
+}
+
+docs {
+  # Create Subscription
+  
+  Creates a new alert subscription. The user will receive an email when a matching product appears in Apple's refurbished store.
+  
+  ## Fields
+  
+  | Field        | Type    | Required | Notes                                                   |
+  |-------------|---------|----------|---------------------------------------------------------|
+  | email        | string  | Yes      | Subscriber email address                                |
+  | category     | string  | Yes      | One of: mac, ipad, iphone, watch, airpods, appletv, accessories |
+  | modelKeyword | string  | Yes      | Keyword to match against product title (e.g. "MacBook Pro 14") |
+  | country      | string  | Yes      | Country code (e.g. us, uk, ca, au, fr, de, jp)         |
+  | minPrice     | integer | No       | Minimum price in cents (e.g. 100000 = $1,000.00)        |
+  | maxPrice     | integer | No       | Maximum price in cents (e.g. 200000 = $2,000.00)        |
+  
+  ## Response
+  
+  ```json
+  { "result": { "data": { "json": { "success": true } } } }
+  ```
+}

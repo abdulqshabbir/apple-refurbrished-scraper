@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(SKIP_ENV_VALIDATION=true npm run typecheck)",
-      "Bash(SKIP_ENV_VALIDATION=true npm run *)"
+      "Bash(SKIP_ENV_VALIDATION=true npm run *)",
+      "Bash(curl -s 'https://www.apple.com/shop/refurbished/browse?pl=true&mco=refurbished&page=1&hits=40' -H 'User-Agent: Mozilla/5.0 \\(Macintosh; Intel Mac OS X 10_15_7\\) AppleWebKit/537.36' -H 'Accept: application/json, text/javascript, */*')",
+      "Bash(curl -s https://www.apple.com/tw/shop/refurbished -H 'User-Agent: Mozilla/5.0 \\(Macintosh; Intel Mac OS X 10_15_7\\) AppleWebKit/537.36' -H 'Accept: text/html,application/xhtml+xml')"
     ]
   }
 }

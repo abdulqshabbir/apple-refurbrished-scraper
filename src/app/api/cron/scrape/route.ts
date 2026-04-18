@@ -5,8 +5,9 @@ import { runScraper } from "~/lib/scraper";
 export const maxDuration = 60;
 
 export async function GET(req: NextRequest) {
+  const isProd = env.NODE_ENV === "production";
   const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${env.CRON_SECRET}`) {
+  if (isProd && authHeader !== `Bearer ${env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

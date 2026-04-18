@@ -1,8 +1,8 @@
 import { sql } from "drizzle-orm";
-import { index, integer, sqliteTableCreator, text } from "drizzle-orm/sqlite-core";
+import { index, sqliteTableCreator } from "drizzle-orm/sqlite-core";
 
 export const createTable = sqliteTableCreator(
-  (name) => `apple-refurbished-scraper_${name}`,
+  (name) => `apple_refurbished_scraper_${name}`,
 );
 
 export const subscriptions = createTable(
@@ -10,6 +10,7 @@ export const subscriptions = createTable(
   (d) => ({
     id: d.text().primaryKey(),
     email: d.text().notNull(),
+    category: d.text().notNull(),
     modelKeyword: d.text().notNull(),
     country: d.text().notNull(),
     minPrice: d.integer(),
@@ -21,7 +22,7 @@ export const subscriptions = createTable(
       .notNull()
       .default(sql`(unixepoch())`),
   }),
-  (t) => [index("subscription_email_idx").on(t.email)],
+  (t) => [index("ars_subscription_email_idx").on(t.email)],
 );
 
 export const products = createTable(
@@ -42,7 +43,7 @@ export const products = createTable(
       .notNull()
       .default(sql`(unixepoch())`),
   }),
-  (t) => [index("product_country_idx").on(t.country)],
+  (t) => [index("ars_product_country_idx").on(t.country)],
 );
 
 export const notificationsSent = createTable(
@@ -63,7 +64,7 @@ export const notificationsSent = createTable(
       .default(sql`(unixepoch())`),
   }),
   (t) => [
-    index("notification_subscription_idx").on(t.subscriptionId),
-    index("notification_product_idx").on(t.productId),
+    index("ars_notification_subscription_idx").on(t.subscriptionId),
+    index("ars_notification_product_idx").on(t.productId),
   ],
 );

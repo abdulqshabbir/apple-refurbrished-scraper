@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { api } from "~/trpc/react";
 import { COUNTRIES } from "~/lib/countries";
+import { CATEGORIES } from "~/lib/categories";
 
 export function SubscriptionForm() {
   const router = useRouter();
@@ -23,6 +24,7 @@ export function SubscriptionForm() {
 
     create.mutate({
       email: form.get("email") as string,
+      category: form.get("category") as string,
       modelKeyword: form.get("modelKeyword") as string,
       country: form.get("country") as string,
       minPrice: minPriceRaw ? Math.round(parseFloat(minPriceRaw) * 100) : undefined,
@@ -32,6 +34,23 @@ export function SubscriptionForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div>
+        <label className="mb-1 block text-sm font-medium text-gray-700">
+          Product category
+        </label>
+        <select
+          name="category"
+          required
+          className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          {Object.entries(CATEGORIES).map(([key, label]) => (
+            <option key={key} value={key}>
+              {label}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <div>
         <label className="mb-1 block text-sm font-medium text-gray-700">
           Model keyword

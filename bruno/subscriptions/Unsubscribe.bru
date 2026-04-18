@@ -1,0 +1,41 @@
+meta {
+  name: Unsubscribe
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api/trpc/subscriptions.unsubscribe
+  body: json
+  auth: none
+}
+
+headers {
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "json": {
+      "token": "{{unsubscribe_token}}"
+    }
+  }
+}
+
+docs {
+  # Unsubscribe
+  
+  Deactivates a subscription using the unsubscribe token from the alert email.
+  
+  ## Fields
+  
+  | Field | Type   | Required | Notes                                           |
+  |-------|--------|----------|-------------------------------------------------|
+  | token | string | Yes      | The unsubscribe token from the alert email link |
+  
+  ## Response
+  
+  ```json
+  { "result": { "data": { "json": { "success": true } } } }
+  ```
+}

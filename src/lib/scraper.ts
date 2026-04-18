@@ -14,18 +14,19 @@ interface AppleProduct {
 
 async function fetchRefurbishedProducts(
   countryCode: string,
+  category: string,
 ): Promise<AppleProduct[]> {
   const country = COUNTRIES[countryCode];
   if (!country) return [];
 
   const slugPrefix = country.slug ? `/${country.slug}` : "";
-  const url = `https://www.apple.com${slugPrefix}/shop/refurbished/browse?pl=true&mco=refurbished&page=1&hits=40`;
+  const url = `https://www.apple.com${slugPrefix}/shop/refurbished/${category}`;
 
   const res = await fetch(url, {
     headers: {
       "User-Agent":
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
-      Accept: "application/json, text/javascript, */*",
+      Accept: "text/html,application/xhtml+xml",
     },
   });
 
@@ -33,19 +34,18 @@ async function fetchRefurbishedProducts(
 
   const text = await res.text();
 
-  // Apple's refurbished page returns HTML with embedded JSON; parse product tiles
   const { load } = await import("cheerio");
   const $ = load(text);
   const result: AppleProduct[] = [];
 
-  $(".rf-refurb-product-tile-wrapper").each((_, el) => {
-    const titleEl = $(el).find(".rf-refurb-product-tile-description h3 a");
-    const priceEl = $(el).find(".rf-refurb-product-tile-price .current_price");
+  $(".rf-refurb-category-grid-no-js li").each((_, el) => {
+    const titleEl = $(el).find("h3 a");
+    const priceEl = $(el).find(".as-producttile-currentprice");
     const href = titleEl.attr("href") ?? "";
     const title = titleEl.text().trim();
     const priceText = priceEl.text().replace(/[^0-9.]/g, "");
     const price = Math.round(parseFloat(priceText) * 100);
-    const partNumberMatch = href.match(/\/([A-Z0-9]+)(?:\?|$)/);
+    const partNumberMatch = href.match(/\/product\/([^/]+)\//i);
     const partNumber = partNumberMatch?.[1] ?? href;
 
     if (title && price > 0 && partNumber) {
@@ -71,10 +71,14 @@ export async function runScraper() {
 
   if (activeSubscriptions.length === 0) return;
 
-  const uniqueCountries = [...new Set(activeSubscriptions.map((s) => s.country))];
+  const uniquePairs = [
+    ...new Map(
+      activeSubscriptions.map((s) => [`${s.country}:${s.category}`, { country: s.country, category: s.category }]),
+    ).values(),
+  ];
 
-  for (const countryCode of uniqueCountries) {
-    const fetched = await fetchRefurbishedProducts(countryCode);
+  for (const { country: countryCode, category } of uniquePairs) {
+    const fetched = await fetchRefurbishedProducts(countryCode, category);
 
     for (const item of fetched) {
       const productId = `${item.partNumber}_${countryCode}`;
@@ -106,6 +110,7 @@ export async function runScraper() {
 
       const matchingSubs = activeSubscriptions.filter((sub) => {
         if (sub.country !== countryCode) return false;
+        if (sub.category !== category) return false;
         const keyword = sub.modelKeyword.toLowerCase();
         if (!item.title.toLowerCase().includes(keyword)) return false;
         if (sub.minPrice !== null && item.price < sub.minPrice) return false;

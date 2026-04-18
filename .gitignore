@@ -44,3 +44,9 @@ yarn-error.log*
 
 # idea files
 .idea
+
+# Ignore claude
+CLAUDE.md
+
+# Ignore Bruno
+bruno/environments/
